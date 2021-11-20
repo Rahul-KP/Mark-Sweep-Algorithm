@@ -11,3 +11,41 @@
 13
 14
 -1
+
+
+		10
+       /  \
+      8	   12
+     /\    /\
+    5  9  11 16
+   /\        /
+  2  6      13
+  \	     	 \	
+   4         14
+
+
+   		10
+       /  \
+      8	   12
+      \    /\
+    5  9  11 16
+   /\        /
+  2  6      13
+  \	     	 \	
+   4         14
+
+
+
+
+Algorithm
+
+
+
+
+
+1. make a binary tree
+2. unlink any one of the nodes
+3. traverse the tree and perform mark operation 
+	if the node exists then ,
+			set marked bit to 1
+4. sweep phase 

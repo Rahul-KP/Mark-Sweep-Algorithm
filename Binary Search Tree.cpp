@@ -1,84 +1,104 @@
 #include<stdio.h>
 #include<stdlib.h>
-struct BstNode
-{
+struct objectTree {
 	int data;
-	BstNode *left;
-	BstNode *right;
+	objectTree *left;
+	objectTree *right;
+	int marked_bit;
 };
 
-// Global Variable
-int num;
+// typedef struct heap {
+// 	int addr;
+// 	int marked_bit;
+// }heap;
 
-BstNode* Create(int data)
-{
-	BstNode* newNode = (BstNode*)malloc(sizeof(BstNode));
+//Free list is a linked list of all free blocks currently availabe on the heap
+typedef struct freeList {
+	int address;
+	struct freeList* next;
+}fl;
+
+// Global Variables
+// heap h[100];
+// int h_free = 0;
+
+objectTree *root = NULL;
+
+objectTree* Create(int data) {
+	objectTree* newNode = (objectTree*)malloc(sizeof(objectTree));
 	newNode->data = data;
 	newNode->left = newNode->right = NULL;
+	newNode->marked_bit = 0;
 	return newNode;
 }
-BstNode* Insert(BstNode* root,int data)
-{
-	if(root == NULL) // empty tree
-	{
+
+objectTree* Insert(objectTree* root,int data) {
+	if(root == NULL) /*empty tree*/{
 		root = Create(data);
+		// heap_alloc(root);
 		return root;
 	}
-	else if(data <= root->data)
-	{
+	else if(data <= root->data) {
 		root->left = Insert(root->left,data);
+		// heap_alloc(root->left);
 		return root;
 	}
-	else
-	{
+	else {
 		root->right = Insert(root->right,data);
+		// heap_alloc(root_right);
 		return root;
 	}
 }
-bool Search(BstNode* root,int data)
-{
-	if(root == NULL)
-	{
+
+// void heap_alloc(objectTree obj) {
+// 	h[h_free].addr = &obj;
+// 	h[h_free].marked_bit = 0;
+// 	h_free++;
+// }
+
+void mark(objectTree* root) {
+	if(root != NULL) {
+		root->marked_bit = 1;
+	}
+	mark(root->left);
+	mark(root->right);
+}
+
+bool Search(objectTree* root,int data) {
+	if(root == NULL) {
 		return false;
 	}
-	else if(root->data == data)
-	{
+	else if(root->data == data) {
 		return true;
 	}
-	else if(data <= root->data)
-	{
+	else if(data <= root->data) {
 		return Search(root->left,data);
 	}
-	else
-	{
+	else {
 		return Search(root->right,data);
 	}
 }
 
-void disp(struct BstNode *root)
-{
-  struct BstNode *t = root;
-  if(t == NULL)
-  {
+void disp(struct objectTree *root) {
+  struct objectTree *t = root;
+  if(t == NULL) {
     printf("Tree is deleted or does not exist!\n");
   }
-  else
-  {
-    int f = 1, e = -1;
-    while(f == 1)
+  else {
+    int f = 1, choice = -1;
+    while(f == 1) 
     {
       printf("Current node is %d\n",t->data);
-      if(t->left !=NULL)
-      {
+      printf("Status - %d\n",t->marked_bit);
+      if(t->left !=NULL) {
         printf("Left: %d\t",t->left->data);
       }
-      if(t->right != NULL)
-      {
+      if(t->right != NULL) {
         printf("Right: %d",t->right->data);
       }
-      printf("\n1. Left\n2. Right\n3. Root\n4. Delete Left node\n5. Delete Right node\n0. Exit\n> ");
-      scanf("%d",&e);
-      switch(e)
+      printf("\n1. Left\n2. Right\n3. Root\n4. Delete Left node\n5. Delete Right node\n6. Mark\n0. Exit\n> ");
+      scanf("%d",&choice);
+      switch(choice)
       {
         case 1:
         if(t->left == NULL)
@@ -104,70 +124,39 @@ void disp(struct BstNode *root)
         t->left = NULL; break;
         case 5:
         t->right = NULL; break;
+        case 6:
+        mark(root);
+        printf("Done Marking");
+        break;
         case 0:
         f = 0; break;
         default:
-        printf("Enter a correct choice(0-3)!\n");break;
+        printf("Enter a correct choice(0-5)!\n");break;
       }
     }
   }
 }
 
-void inorder(struct BstNode*root)
-{
-	if(root==NULL)
-	{
-		return;
-	}
-	inorder(root->left);
-	printf("%d , ",root->data);
-	inorder(root->right);
-}
-
-void preorder(struct BstNode *root)
-{
-	if(root==NULL)
-	{
-		return;
-	}
-	printf("%d , ",root->data);
-	preorder(root->left);
-	preorder(root->right);
-}
-
-void postorder(struct BstNode *root)
-{
-	if(root==NULL)
-	{
-		return;
-	}
-	postorder(root->left);
-	postorder(root->right);
-	printf("%d , ",root->data);
-}
-
-BstNode *root = NULL;
-int main()
-{	
+int main() {
 	printf("\nEnter 1 to create a Binary Tree\n");
 	printf("Enter 2 to Search for an element in the Binary tree\n");
 	printf("Enter 3 to display Binary tree and delete desired node \n");
-	printf("Enter 4 to display Inorder traversal\n");
-	printf("Enter 5 to display Preorder traversal\n");
-	printf("Enter 6 to display Postorder traversal\n");
-	printf("Press 7 to quit\n");
+	printf("Press 4 to quit\n");
 	int ch;
+	int num = 0;
 	scanf("%d",&ch);
 	switch (ch)
 	{
 		case 1:
 			printf("Enter -1 to stop entering numbers\n");
-			do
+			while(true)
 			{
 				printf("Enter a number : ");
 				scanf("%d",&num);
+				if(num == -1)
+					break;
 				root=Insert(root,num);	
-			}while(num != -1 );
+			}
 			main();
 			break;
 			case 2:
@@ -182,15 +171,6 @@ int main()
 				disp(root);
 				main();
 			case 4:
-				inorder(root);
-				main();
-			case 5:
-				preorder(root);
-				main();
-			case 6:
-				postorder(root);
-				main();
-			case 7:
 				exit(0);			
 			break;			
 		}
