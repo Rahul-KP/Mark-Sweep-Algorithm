@@ -1,12 +1,12 @@
 #include<stdio.h>
 #include<stdlib.h>
 // #include<conio.h>
-struct objectTree {
+typedef struct objectTree {
 	int data;
-	objectTree *left;
-	objectTree *right;
+	struct objectTree *left;
+	struct objectTree *right;
 	int marked_bit;
-};
+}objectTree;
 
 // typedef struct heap {
 // 	int addr;
@@ -65,12 +65,12 @@ void mark(objectTree* root) {
 	mark(root->right);
 }
 
-bool Search(objectTree* root,int data) {
+int Search(objectTree* root,int data) {
 	if(root == NULL) {
-		return false;
+		return 0;
 	}
 	else if(root->data == data) {
-		return true;
+		return 1;
 	}
 	else if(data <= root->data) {
 		return Search(root->left,data);
@@ -89,7 +89,6 @@ void disp(struct objectTree *root) {
     int f = 1, choice = -1;
     while(f == 1) 
     {
-    	clrscr();
       printf("Current node is %d\n",t->data);
       printf("Status - %d\n",t->marked_bit);
       if(t->left !=NULL) {
@@ -150,9 +149,8 @@ int main() {
 	switch (ch)
 	{
 		case 1:
-			clrscr();
 			printf("Enter -1 to stop entering numbers\n");
-			while(true)
+			while(1)
 			{
 				printf("Enter a number : ");
 				scanf("%d",&num);
@@ -165,7 +163,7 @@ int main() {
 			case 2:
 				printf("Enter a number to search \n");
 				scanf("%d",&num);
-				if(Search(root,num) == true) 
+				if(Search(root,num) == 1) 
 				printf("Found\n");
 				else
 				printf("Not Found\n");
