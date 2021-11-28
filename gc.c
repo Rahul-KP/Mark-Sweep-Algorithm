@@ -79,6 +79,16 @@ void display_garbage()
 	r = head;
 }
 
+void free_memory(freeList *head) {
+	
+		if(head->next != NULL) {
+		free_memory(head->next);
+	}
+	free(head->address);
+	free(head);
+	printf("Memory freed\n");
+}
+
 int Search(objectTree* root,int data) {
 	if(root == NULL) {
 		return 0;
@@ -110,7 +120,7 @@ void disp(struct objectTree *root) {
       if(t->right != NULL) {
         printf("Right: %d",t->right->data);
       }
-      printf("\n1. Left\n2. Right\n3. Root\n4. Delete Left node\n5. Delete Right node\n6. DisplayGarbage\n0. Exit\n> ");
+      printf("\n1. Left\n2. Right\n3. Root\n4. Delete Left node\n5. Delete Right node\n6. Display Garbage\n7. Free Memory\n0. Exit\n> ");
       scanf("%d",&choice);
       switch(choice)
       {
@@ -142,6 +152,8 @@ void disp(struct objectTree *root) {
         t->right = NULL; break;
         case 6:
         display_garbage(); break;
+        case 7:
+        free_memory(r); break;
         case 0:
         f = 0; break;
         default:
