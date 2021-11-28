@@ -5,23 +5,15 @@ typedef struct objectTree {
 	int data;
 	struct objectTree *left;
 	struct objectTree *right;
-	int marked_bit;
 }objectTree;
 
-// typedef struct heap {
-// 	int addr;
-// 	int marked_bit;
-// }heap;
-
-//Free list is a linked list of all free blocks currently availabe on the heap
+//Free list is a linked list of all unreachable memory blocks currently availabe on the heap
 typedef struct freeList {
-	int address;
 	struct freeList* next;
-}fl;
+	objectTree *address;
+}freeList;
 
-// Global Variables
-// heap h[100];
-// int h_free = 0;
+freeList *r = NULL;
 
 objectTree *root = NULL;
 
@@ -29,43 +21,62 @@ objectTree* Create(int data) {
 	objectTree* newNode = (objectTree*)malloc(sizeof(objectTree));
 	newNode->data = data;
 	newNode->left = newNode->right = NULL;
-	newNode->marked_bit = 0;
 	return newNode;
 }
 
 objectTree* Insert(objectTree* root,int data) {
 	if(root == NULL) /*empty tree*/{
 		root = Create(data);
-		// heap_alloc(root);
 		return root;
 	}
 	else if(data <= root->data) {
 		root->left = Insert(root->left,data);
-		// heap_alloc(root->left);
 		return root;
 	}
 	else {
 		root->right = Insert(root->right,data);
-		// heap_alloc(root_right);
 		return root;
 	}
 }
 
-// void heap_alloc(objectTree obj) {
-// 	h[h_free].addr = &obj;
-// 	h[h_free].marked_bit = 0;
-// 	h_free++;
-// }
-
-void mark(objectTree* root) {
-	if(root != NULL) {
-		root->marked_bit = 1;
+void insert_freeList(objectTree* deleted) {
+	if (r == NULL) {
+		r = (freeList*)malloc(sizeof(freeList));
+		r->next = NULL;
+		r->address = deleted;
 	}
 	else {
-		return;
+		freeList *head = r;
+		while(r->next != NULL) {
+			r = r->next; 
+		}
+		freeList *temp = (freeList*)malloc(sizeof(freeList));
+		temp->next = NULL;
+		temp->address = deleted;
+		r->next = temp;
+		r = head;
 	}
-	mark(root->left);
-	mark(root->right);
+}
+
+void delete(objectTree* deleted) {
+	if(deleted != NULL) {
+		insert_freeList(deleted);
+		delete(deleted->left);
+		delete(deleted->right);
+		deleted = NULL;
+	}
+}
+
+void display_garbage()
+{
+	printf("Addresses lost\n");
+	freeList *head = r;
+	while(r->next != NULL) {
+		printf("Address of %d : %p \n",r->address->data,r->address);
+		r = r->next;
+	}
+	printf("Address of %d : %p \n",r->address->data,r->address);
+	r = head;
 }
 
 int Search(objectTree* root,int data) {
@@ -93,14 +104,13 @@ void disp(struct objectTree *root) {
     while(f == 1) 
     {
       printf("Current node is %d\n",t->data);
-      printf("Status - %d\n",t->marked_bit);
       if(t->left !=NULL) {
         printf("Left: %d\t",t->left->data);
       }
       if(t->right != NULL) {
         printf("Right: %d",t->right->data);
       }
-      printf("\n1. Left\n2. Right\n3. Root\n4. Delete Left node\n5. Delete Right node\n6. Mark\n0. Exit\n> ");
+      printf("\n1. Left\n2. Right\n3. Root\n4. Delete Left node\n5. Delete Right node\n6. DisplayGarbage\n0. Exit\n> ");
       scanf("%d",&choice);
       switch(choice)
       {
@@ -125,13 +135,13 @@ void disp(struct objectTree *root) {
         case 3:
         t = root; break;
         case 4:
+        delete(t->left);
         t->left = NULL; break;
         case 5:
+        delete(t->right);
         t->right = NULL; break;
         case 6:
-        mark(root);
-        printf("Done Marking");
-        break;
+        display_garbage(); break;
         case 0:
         f = 0; break;
         default:
