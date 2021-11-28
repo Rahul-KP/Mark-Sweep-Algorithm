@@ -61,6 +61,9 @@ void mark(objectTree* root) {
 	if(root != NULL) {
 		root->marked_bit = 1;
 	}
+	else {
+		return;
+	}
 	mark(root->left);
 	mark(root->right);
 }
