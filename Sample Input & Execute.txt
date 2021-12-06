@@ -59,3 +59,19 @@ sweep phase
   2  6      13
   \          \  
    4         14
+
+
+Execute
+
+1. Demonstration needs debugger.
+2. Compile the code as gcc gc.c -g -o gc.exe
+3. next run gdb gc
+
+4. set desired break point
+5. delete a node to create garbage nodes
+6 .run display garbage function
+7. copy the address of any garbage node
+8. verify that the addresses have the values previously entered
+9. now run free memory
+10.in gdb use command x/w 0x<address> to display the value at that location
+11.The resulting output will be different from the previously entered value 
